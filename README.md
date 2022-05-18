@@ -14,12 +14,12 @@ INSTALLATION
 
 2. Installer les fichiers manquants
 
-2.1. Lancez la commande « composer install » pour installer toutes les dépendances\
-2.2. Remplissez un fichier « .env » avec vos propres informations de base de données et de mail\
-2.3. Configurez un fichier « config/packages/swiftmailer.yaml » avec vos données de mail
+2.1. si vous n'avez pas composer, installez le, en suivant les instructions sur getcomposer.org/download\
+2.2. utilisez le en version 1, pour éviter les problèmes de compatiblité : composer self-update --1
+2.3. Lancez la commande « composer install » pour installer toutes les dépendances\
+2.5. Configurez un fichier « config/packages/swiftmailer.yaml » avec vos données de mail
 
 3. Base de données
 
-3.1. Créez la base de données en lignes de commande : « bin/console doctrine:database:create »\
-3.2. Créez les tables : « bin/console doctrine:migrations:migrate »\
-3.3. Lancez la commande « bin/console doctrine:fixtures:load » pour remplir votre base de données avec les données initiales
+3.1. importez la base de données (fichier SQL présent dans le repository) via votre SGBD (par exemple, via phpmyadmin)\
+3.2. modifiez le fichier ".env" avec vos propres informations de base de données et de mail\
