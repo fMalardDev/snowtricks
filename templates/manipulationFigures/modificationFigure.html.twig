@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}modifier {{ figure.nom }}{% endblock %}
+
+{% form_theme form with ["manipulationFigures/_modifs_illu_anciennes.html.twig", "manipulationFigures/_modifs_videos_anciennes.html.twig", "manipulationFigures/_modifs_videos_ajout.html.twig"] %}
+
+{% block body %}
+
+    <div class="container jumbotron">
+        <h1 class="text-center mb-5">Modifiez la figure</h1>
+
+        {{ form(form) }}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/modifFigureAjouterVideos.js"></script>
+    {#<script src="/js/supprimerIllustrationsEtVideos.js"></script>#}
+{% endblock %}

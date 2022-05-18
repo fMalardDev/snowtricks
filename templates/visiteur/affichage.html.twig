@@ -1,0 +1,285 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ figure.nom }}{% endblock %}
+
+{% form_theme form _self %}
+
+{% block body %}
+
+{# image en tête : première image, s'il n'y a pas d'images, une image par défaut. image d'en tête de l'accueil ? #}
+
+{% if figure.illustrations|length > 0 %}
+    <header class="m-0 w-100" style="height: 100vh; min-height: 500px; background-image: url('{{ figure.illustrations[0].url }}'); background-size: cover; background-position: center; background-repeat: no-repeat; color: #fea; text-shadow: 3px 3px 3px black;">
+{% else %}
+    <header class="m-0 w-100" style="height: 100vh; min-height: 500px; background-image: url('/images/enTete.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; color: #fea; text-shadow: 3px 3px 3px black;">
+{% endif %}
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12 text-center">
+                <h1 class="font-weight-bold text-uppercase" style="color: #fea;">
+                    {{ figure.nom }}
+                </h1>
+            </div>
+        </div>
+    </div>
+</header>
+
+{# modifier ou supprimer #}
+{% if app.user == figure.editeur or (app.user and "ROLE_MODO" in app.user.roles) %}
+    <div class="float-right" style="margin-top: -3em; margin-right: 1em; font-size: 2em;">
+        <a href="{{ path("modifier_figure", {"slug" : figure.slug}) }}" style="color: #fea;" class="text-warning">
+            <i class="fas fa-pencil-alt">
+            </i>
+        </a>
+        <a href="{{ path("supprimer_figure", {"slug" : figure.slug}) }}" style="color: #fea;" class="ml-3 text-danger" onclick="return confirm('Voulez vous supprimer la figure {{ figure.nom }} ?');">
+            <i class="fas fa-trash-alt">
+            </i>
+        </a>
+    </div>
+{% endif %}
+
+{# illustrations et vidéos #}
+<div class="d-sm-flex justify-content-center flex-wrap">
+    {% for illustration in figure.illustrations %}
+        <a href="{{ illustration.url }}" style="display: block; width: 250px;" class="mx-auto my-3">
+            <img src="{{ illustration.url }}" alt="{{ illustration.alt }}" style="width: 100%;">
+        </a>
+    {% endfor %}
+    {% for video in figure.videos %}
+        <iframe src="{{ video.url }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 250px;" class="mx-auto my-3">{{ video.alt }}</iframe>
+    {% endfor %}
+</div>
+
+<div class="container my-4 jumbotron">
+    {# ajouter la figure aux favorites #}
+    {% if app.user and not (figure in app.user.favoris) %}
+        <p class="text-center mb-5">
+            <a href="{{ path("ajout_favoris", {"slugUtilisateur" : app.user.slug, "slugFigure" : figure.slug}) }}" class="text-danger">
+                <i class="fas fa-heart text-danger mr-1"></i> ajouter la figure à vos favorites
+            </a>
+        </p>
+    {% endif %}
+
+    {# description #}
+    {{ figure.description }}
+
+    {# données importantes : date création, groupe, date modification si existe #}
+    <div class="text-center mt-5">
+        <span class="badge badge-primary mx-auto my-3">
+            {{ figure.getDateCreationString() }}
+        </span>
+        <span class="badge badge-primary mx-auto my-3">
+            {{ figure.groupe.nom }}
+        </span>
+        {% if not figure.dateModification is null %}
+            <span class="badge badge-primary mx-auto my-3">
+                {{ figure.getDateModificationString() }}
+            </span>
+        {% endif %}
+        {% if app.user and "ROLE_MODO" in app.user.roles %}
+            <span class="badge badge-primary mx-auto my-3">
+                {% if figure.editeur is defined and not figure.editeur is null %}
+                    {{ figure.editeur.login }} {# pour modération : modo peut retrouver l'éditeur dans l'interface de gestion des comptes s'il troll ou créé n'importe quoi volontairement #}
+                {% elseif not figure.editeur is defined or figure.editeur is null %}
+                    utilisateur supprimé
+                {% endif %}
+            </span>
+        {% endif %}
+    </div>
+
+    {# prérequis #}
+
+    {% if not (figure.prerequis is empty and figure.suitesPossibles is empty) %}
+        <div class="prerequis bg-dark py-3 mt-3">
+            {% if not figure.prerequis is empty %}
+                <p class="text-center text-warning">
+                    prérequis :
+                </p>
+                <p class="text-center">
+                    {% for prerequis in figure.prerequis %}
+                        <a href="{{ path("figure_affichage", {"slug" : prerequis.slug}) }}" class="badge badge-warning" style="color: black;">
+                            {{ prerequis.nom }}
+                        </a>
+                    {% endfor %}
+                </p>
+            {% endif %}
+            {% if not figure.suitesPossibles is empty %}
+                <p class="text-center text-success">
+                    suites possibles :
+                </p>
+                <p class="text-center">
+                    {% for suitePossible in figure.suitesPossibles %}
+                        <a href="{{ path("figure_affichage", {"slug" : suitePossible.slug}) }}" class="badge badge-success" style="color: black;">
+                            {{ suitePossible.nom }}
+                        </a>
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# difficulté #}
+
+    {% set opacite = 0.2 %}
+    {% set nbAffiches = 0 %}
+
+    {% if nbAffichages > 0 %}
+
+        <div class="bg-dark text-center text-white py-4 my-4">
+
+        <p class="text-uppercase", style="color: {{ couleur }};">
+            difficulté de la figure
+        </p>
+
+        {% if nbAffichages > 1 %}
+            <div class="row">
+        {% endif %}
+        
+        {% if nbAffichages == 2 %}
+            <div class="col-sm-6">
+        {% endif %}
+
+        {% if nbAffichages == 3 %}
+            <div class="col-md-4">
+        {% endif %}
+
+            {# affichage note éditeur si l'éditeur n'est pas l'utilisateur courant (sinon ferait doublon avec la suite) #}
+            {% if not difficulteEditeur is null and not utilisateurCourantEstEditeur %}
+                {{ "selon l'éditeur" | tetes(difficulteEditeur) | raw }}
+                
+                {% set nbAffiches = 1 %}
+
+                {% if nbAffichages == 2 %}
+                    </div>
+                    <div class="col-sm-6">
+                {% endif %}
+
+                {% if nbAffichages == 3 %}
+                    </div>
+                    <div class="col-md-4">
+                {% endif %}
+            {% endif %}
+
+            {# affichage note moyenne sans compter l'éditeur #}
+            {% if not (difficulteMoyenneSansEditeur is null) %}
+                {{ "moyenne des utilisateurs" | tetes(difficulteMoyenneSansEditeur) | raw }}
+                
+                {% set nbAffiches = nbAffiches + 1 %}
+
+                {% if nbAffichages == 2 and nbAffichages != nbAffiches %}
+                    </div>
+                    <div class="col-sm-6">
+                {% endif %}
+
+                {% if nbAffichages == 3 %}
+                    </div>
+                    <div class="col-md-4">
+                {% endif %}
+            {% endif %}
+
+            {# affichage note utilisateur courant s'il en a mit une #}
+            {% if not difficulteUtilisateurCourant is null %}
+                {{ "votre avis" | tetes(difficulteUtilisateurCourant, true, path("noter_difficulte", {"slugFigure" : figure.slug, "slugUtilisateur" : app.user.slug, "note" : 0})) | raw }}
+            {% endif %}
+
+            {# pour l'utilisateur courant, si est connecté mais n'a pas noté : affichage têtes grisées, qui serviront à noter en cliquant sur l'une d'elle #}
+            {% if app.user and difficulteUtilisateurCourant is null %}
+                {{ "votre avis" | tetes(0, true, path("noter_difficulte", {"slugFigure" : figure.slug, "slugUtilisateur" : app.user.slug, "note" : 0})) | raw }}
+            {% endif %}
+
+        {% if nbAffichages == 3 %}
+            </div>
+        {% endif %}
+
+        {% if nbAffichages == 2 %}
+            </div>
+        {% endif %}
+
+        {% if nbAffichages > 1 %}
+            </div>
+        {% endif %}
+
+        </div>
+        
+    {% endif %}
+
+    {# formulaire d'ajout de commentaire (si inscrit) #}
+
+    {% if app.user %}
+        <hr class="my-5">
+
+        {{ form(form) }}
+    {% endif %}
+
+    {# derniers commentaires #}
+
+    <hr class="my-5">
+
+    <div id="commentaires">
+        {% for commentaire in figure.commentaires|reverse %}
+            {#% if loop.index > 10 %}
+                <div class="commentaire m-3 d-none">
+            {% else %#}
+                <div class="commentaire m-3{# d-block#}">
+            {#% endif %#}
+                {% if commentaire.auteur.avatar is defined and not commentaire.auteur.avatar is null %}
+                    <img src="{{ commentaire.auteur.avatar }}" alt="avatar" style="float: left; width: 64px; height: 64px; display:block;">
+                {% else %}
+                    <p class="text-center text-primary" style="float: left; width: 64px; height: 64px; padding-top: 14px;">
+                        <i class="fas fa-user" style="font-size: 48px; vertical-align: middle; display: inline-block; margin: 0 auto;" alt="avatar"></i>
+                    </p>
+                {% endif %}
+                <div style="margin-left: 80px;">
+                    <p class="float-right">
+                        <button class="badge badge-warning signalerCommentaire" style="border: 0px;" id="signaler{{ commentaire.id }}">
+                            signaler
+                        </button>
+                        {% if app.user and "ROLE_MODO" in app.user.roles %}
+                            <button class="badge badge-danger supprimerCommentaire" style="border: 0px;" id="supprimer{{ commentaire.id }}">
+                                supprimer
+                            </button>
+                        {% endif %}
+                    </p>
+                    <p class="lead">
+                        {{ commentaire.auteur.login }} - le {{ commentaire.getDateCreationString() }}
+                    </p>
+                    <p>
+                        {{ commentaire.contenu }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="paginationDiv" {% if figure.commentaires|length > 10 %}class="d-flex justify-content-center"{% endif %}>
+        <ul class="pagination m-auto text-center">
+            <li class="page-item disabled" id="pagePrecedente">
+                <a class="page-link" href="#">
+                    &laquo;
+                </a>
+            </li>
+            <li class="page-item" id="pageSuivante">
+                <a class="page-link" href="#">
+                    &raquo;
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {# bouton de chargement de commentaires #}
+    
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script type="text/javascript">
+        $pathSignaler = "{{ path("signaler_commentaire", {"slug" : figure.slug, "idCommentaire" : "id"}) }}";
+        $pathSupprimer = "{{ path("supprimer_commentaire", {"slug" : figure.slug, "idCommentaire" : "id"}) }}";
+    </script>
+    <script src="/js/gestionCommentaires.js"></script>
+    <script src="/js/survolTetesDeMort.js"></script>
+    <script src="/js/paginationCommentaires.js"></script>
+
+{% endblock %}

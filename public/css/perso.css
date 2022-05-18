@@ -1,0 +1,81 @@
+.masthead
+{
+    height: 100vh;
+    min-height: 500px;
+    background-image: url('/images/enTete.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fea;
+    text-shadow: 3px 3px 3px black;
+}
+
+/*.figureEnTete
+{
+    color: #fea;
+    text-shadow: 3px 3px 3px black;
+}*/
+
+.masthead h1
+{
+    color: #fea;
+}
+
+.miniatureFigure
+{
+    height: 150px;
+    width: 100%;
+    display: block;
+}
+
+.photographe
+{
+    margin-bottom: 1em;
+    text-shadow: 3px 3px 3px rgba(0, 0, 0, 0);
+}
+
+.photographe a
+{
+    color: #a0a0a0
+}
+
+.custom-file-input[type="file"]
+{
+    opacity : 1;
+}
+
+iframe
+{
+    display: block;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin: auto;
+}
+
+.row
+{
+    margin-right: 0px;
+    margin-left: 0px;
+    margin: auto;
+}
+
+/*.decaleParBootstraps
+{
+    margin-right: 0px;
+    margin-left: 0px;
+}*/
+
+/*.lienTeteDeMort:hover, .lienTeteDeMort:focus, .lienTeteDeMort, a:hover, a:focus, a, 
+{
+    text-decoration: none !important;
+}* /
+
+.tetes:hover .tete
+{
+    color: white;
+}
+
+.tete i:hover ~ i
+{
+    color: black;
+}*/

@@ -1,0 +1,40 @@
+###> symfony/framework-bundle ###
+/config/packages/swiftmailer.yaml
+/.env.test
+config/packages/swiftmailer.yaml
+.env.test
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/packages/swiftmailer.yaml
+config/packages/swiftmailer.yaml
+/public/bundles/
+var
+/var/
+vendor
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/web-server-bundle ###
+/.web-server-pid
+###< symfony/web-server-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+### PERSO ###
+/.env
+.env
+/_ign_**
+**/_ign_**
+**/~lock**
+**/.DS_Store
+/config/packages/swiftmailer.yaml

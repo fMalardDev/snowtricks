@@ -1,0 +1,334 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}accueil{% endblock %}
+
+{% block body %}
+
+<header class="masthead">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12 text-center">
+                <h1 class="font-weight-bold text-uppercase">
+                    snowtricks
+                </h1>
+                <p class="lead">
+                    Site communautaire de figures de snowboard
+                </p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<p style="margin-top: -60px; height: 60px; font-size: 2em;" class="mr-3 text-right">
+    <a href="#tricks">
+        <i class="fas fa-arrow-down" style="color: #fea;"></i>
+    </a>
+</p>
+
+{# champs de recherche de figure (ce qui est dans le champs doit être inclu dans le nom des figures en résultat) + filtres + tri #}
+
+<form action="post" class="container jumbotron" id="blockRecherche">
+    <h3 class="text-center mb-4">
+        rechercher
+    </h3>
+    <div class="form-group">
+        <label for="recherche">recheche par nom</label>
+        <input type="text" id="recherche" name="recherche" class="form-control">
+    </div>
+    <hr class="mt-5 mb-4">
+    <h3 class="text-center mb-4">
+        filtrer
+    </h3>
+    <div class="filtrer">
+        <div class="form-group">
+            <h5 class="mb-3">
+                type de figure
+            </h5>
+            <p style="margin-bottom : 0px;" class="filtreGroupes">
+            {% for groupe in groupes %}
+                <span class="d-inline-block">
+                    <input type="checkbox" name="{{ groupe.slug }}" id="{{ groupe.slug }}" class="filtreGroupe">
+                    <label for="{{ groupe.slug }}" style="width: 150px;">{{ groupe.nom }}</label>
+                </span>
+            {% endfor %}
+            </p>
+        </div>
+        <div class="form-group">
+            <h5 class="mb-3">
+                difficulté 
+            </h5>
+            <p class="my-1">
+                selon éditeur :
+                <span class="d-inline-block">
+                    <label for="minDifficulteEditeur" class="ml-3">
+                        minimale
+                    </label>
+                    <select name="minDifficulteEditeur" id="minDifficulteEditeur">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 1 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <label for="maxDifficulteEditeur" class="ml-3">
+                        maximale
+                    </label>
+                    <select name="maxDifficulteEditeur" id="maxDifficulteEditeur">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 10 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <input type="checkbox" name="inclureNonNotesEditeur" id="inclureNonNotesEditeur" checked class="ml-3">
+                    <label for="inclureNonNotesEditeur">inclure les non notés</label>
+                </span>
+            </p>
+            <p class="my-1">
+                moyenne utilisateurs :
+                <span class="d-inline-block">
+                    <label for="minDifficulteMoyenneSansEditeur" class="ml-3">
+                        minimale
+                    </label>
+                    <select name="minDifficulteMoyenneSansEditeur" id="minDifficulteMoyenneSansEditeur">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 1 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <label for="maxDifficulteMoyenneSansEditeur" class="ml-3">
+                        maximale
+                    </label>
+                    <select name="maxDifficulteMoyenneSansEditeur" id="maxDifficulteMoyenneSansEditeur">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 10 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <input type="checkbox" name="inclureNonNotesMoyenneSansEditeur" id="inclureNonNotesMoyenneSansEditeur" checked class="ml-3">
+                    <label for="inclureNonNotesMoyenneSansEditeur">inclure les non notés</label>
+                </span>
+            </p>
+            <p class="my-1">
+                selon moi :
+                <span class="d-inline-block">
+                    <label for="minDifficultePerso" class="ml-3">
+                        minimale
+                    </label>
+                    <select name="minDifficultePerso" id="minDifficultePerso">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 1 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <label for="maxDifficultePerso" class="ml-3">
+                        maximale
+                    </label>
+                    <select name="maxDifficultePerso" id="maxDifficultePerso">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if i == 10 %}selected="selected"{% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span class="d-inline-block">
+                    <input type="checkbox" name="inclureNonNotesPerso" id="inclureNonNotesPerso" checked class="ml-3">
+                    <label for="inclureNonNotesPerso">inclure les non notés</label>
+                </span>
+            </p>
+        </div>
+        <div class="form-group">
+            <h5 class="mb-3">
+                favoris 
+            </h5>
+            <p class="my-1">
+                <input type="checkbox" name="dansMesFavoris" id="dansMesFavoris">
+                <label for="dansMesFavoris" class="ml-1">dans mes favoris</label>
+            </p>
+            <p class="my-1">
+                <label for="nbMinFavoris">
+                    dans les favoris d'au moins
+                </label>
+                <input type="number" name="nbMinFavoris" id="nbMinFavoris" value="0" style="width:4em;" class="ml-1">
+                <label for="nbMinFavoris" class="ml-1">
+                    utilisateurs
+                </label>
+            </p>
+        </div>
+    </div>
+    <hr class="mt-5 mb-4">
+    <h3 class="text-center mb-4">
+        trier
+    </h3>
+    <div class="form-group">
+        <h5 class="mb-3">
+            trier par
+        </h5>
+        <p class="my-1">
+            <span class="d-inline-block">
+                <input type="radio" name="typeTri" id="triDate" value="triDate">
+                <label for="triDate" class="ml-1 text-warning">date d'ajout</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDate" id="recenteDabord" value="recenteDabord" class="ml-3" checked>
+                <label for="recenteDabord" class="ml-1">les récentes en premier</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDate" id="anciennesDabord" value="anciennesDabord" class="ml-3">
+                <label for="anciennesDabord" class="ml-1">les anciennes en premier</label>
+            </span>
+        </p>
+        <p class="my-1">
+            <span class="d-inline-block">
+                <input type="radio" name="typeTri" id="triDifficulteEditeur" value="triDifficulteEditeur">
+                <label for="triDifficulteEditeur" class="ml-1 text-warning">difficulté selon l'éditeur</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDifficulteEditeur" id="difficilesDabordEditeur" value="difficilesDabordEditeur" class="ml-3">
+                <label for="difficilesDabordEditeur" class="ml-1">les difficiles en premier</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDifficulteEditeur" id="facilesDabordEditeur" value="facilesDabordEditeur" class="ml-3" checked>
+                <label for="facilesDabordEditeur" class="ml-1">les faciles en premier</label>
+            </span>
+        </p>
+        <p class="my-1">
+            <span class="d-inline-block">
+                <input type="radio" name="typeTri" id="triDifficulteAutres" value="triDifficulteAutres">
+                <label for="triDifficulteAutres" class="ml-1 text-warning">difficulté selon les autres</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDifficulteAutres" id="difficilesDabordAutres" value="difficilesDabordAutres" class="ml-3">
+                <label for="difficilesDabordAutres" class="ml-1">les difficiles en premier</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreDifficulteAutres" id="facilesDabordAutres" value="facilesDabordAutres" class="ml-3" checked>
+                <label for="facilesDabordAutres" class="ml-1">les faciles en premier</label>
+            </span>
+        </p>
+        <p class="my-1">
+            <span class="d-inline-block">
+                <input type="radio" name="typeTri" id="triFavoris" value="triFavoris">
+                <label for="triFavoris" class="ml-1 text-warning">nombre de mises en favoris</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreFavoris" id="succesDabord" value="succesDabord" class="ml-3" checked>
+                <label for="succesDabord" class="ml-1">les plus appréciées en premier</label>
+            </span>
+            <span class="d-inline-block">
+                <input type="radio" name="ordreFavoris" id="desaimeesDabord" value="desaimeesDabord" class="ml-3">
+                <label for="desaimeesDabord" class="ml-1">les moins appréciées en premier</label>
+            </span>
+        </p>
+    </div>
+
+</form>
+
+<p class="text-center mx-4">
+    <a href="#" id="toggleRecherche">
+        <i class="fas fa-arrow-up mx-3" style="font-size: 1.5em;"></i>
+        <i class="fas fa-arrow-down mx-3" style="font-size: 1.5em;"></i>
+        rechercher / filtrer / trier figures
+        <i class="fas fa-arrow-up mx-3" style="font-size: 1.5em;"></i>
+        <i class="fas fa-arrow-down mx-3" style="font-size: 1.5em;"></i>
+    </a>
+</p>
+
+<div id="corps">
+    <div id="tricks">
+        <div class="row m-3 mt-4 figures">
+            {% for figure in figures %}
+                {% if loop.index > 15 %}
+                    <div class="figure col-sm-6 col-md-4 col-lg-3 col-xl-2 d-none {{ figure.groupe.slug }}" id="{{ figure.slug }}">
+                {% else %}
+                    <div class="figure col-sm-6 col-md-4 col-lg-3 col-xl-2 d-block {{ figure.groupe.slug }}" id="{{ figure.slug }}">
+                {% endif %}
+                    <div class="donnees d-none">
+                        <div class="noteEditeur">{{ figure.getDifficulteEditeur() }}</div>
+                        <div class="noteMoyenneSansEditeur">
+                            {{ figure.getDifficulteMoyenneSansEditeur() }}
+                        </div>
+                        <div class="notePerso">
+                            {{ figure.getDifficulteUtilisateur(app.user) }}
+                        </div>
+                        <div class="estInteresse">
+                            {% if figure.estInteresse(app.user) %}
+                                oui
+                            {% else %}
+                                non
+                            {% endif %}
+                        </div>
+                        <div class="nbInteresses">
+                            {{ figure.interesses|length }}
+                        </div>
+                        <div class="dateCreation">
+                            {{ figure.getDateCreationTimestamp() }}
+                        </div>
+                    </div>
+                    <div class="card bg-light mb-3" style="max-width: 20rem;">
+                        <a href="{{ path("figure_affichage", {"slug" : figure.slug}) }}">
+                            {% if figure.illustrations|length > 0 %}
+                                <img src="{{ figure.illustrations[0].url }}" alt="{{ figure.illustrations[0].alt }}" class="miniatureFigure">
+                            {% else %}
+                                <img src="/images/enTete.jpg" alt="image par défaut" class="miniatureFigure">
+                            {% endif %}
+                        </a>
+                        <div class="card-header">
+                            {% if (app.user != null and app.user == figure.editeur) or (app.user and "ROLE_MODO" in app.user.roles) %}
+                                <div class="float-right mb-0 ml-2">
+                                    <a href="{{ path("modifier_figure", {"slug" : figure.slug}) }}" class="text-warning">
+                                        <i class="fas fa-pencil-alt">
+                                        </i>
+                                    </a>
+                                    <a href="{{ path("supprimer_figure", {"slug" : figure.slug}) }}" class="text-danger supprimerFigure" id="{{ figure.slug }}" onclick="return confirm('Voulez vous supprimer la figure {{ figure.nom }} ?');">
+                                        <i class="fas fa-trash-alt">
+                                        </i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            <a href="{{ path("figure_affichage", {"slug" : figure.slug}) }}">
+                                {{ figure.nom }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if app.user %}
+    <hr class="my-4">
+    <p class="text-center">
+        <a href="{{ path("ajout_figure") }}" class="btn btn-warning">
+            Ajouter une figure
+        </a>
+    </p>
+{% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script type="text/javascript">
+        $pathSupprimer = "{{ path("supprimer_figure", {"slug" : "figure"}) }}";
+    </script>
+
+    <script src="/js/gestionFigures.js"></script>
+    <script src="/js/rechercheFigure.js"></script>
+
+{% endblock %}

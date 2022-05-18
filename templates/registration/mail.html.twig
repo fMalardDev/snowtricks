@@ -1,0 +1,9 @@
+<p>
+    Vous êtes inscrits à snowtricks avec le login {{ utilisateur.login }} !
+</p>
+<p>
+    Dernière étape : la validation de votre compte. Veuillez, pour valider votre compte, cliquer sur le lien ci dessous.
+</p>
+<p>
+    <a href="{{ url("confirmer_inscription", {"slug" : utilisateur.slug, "code" : utilisateur.aVerifier}) }}">Valider l'inscription</a>
+</p>
